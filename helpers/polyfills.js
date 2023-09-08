@@ -11,33 +11,6 @@ export function polyfills() {
       // Point to storage if preceded with fs path
       if (input.startsWith("file:")) return { localUri: input };
 
-      // Unpack Blobs from react-native BlobManager
-      if (input.startsWith("blob:")) {
-        const blob =
-          (await new Promise()) <
-          Blob >
-          ((res, rej) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open("GET", input);
-            xhr.responseType = "blob";
-            xhr.onload = () => res(xhr.response);
-            xhr.onerror = rej;
-            xhr.send();
-          });
-
-        const data =
-          (await new Promise()) <
-          string >
-          ((res, rej) => {
-            const reader = new FileReader();
-            reader.onload = () => res(reader.result);
-            reader.onerror = rej;
-            reader.readAsText(blob);
-          });
-
-        input = `data:${blob.type};base64,${data}`;
-      }
-
       // Create safe URI for JSI
       if (input.startsWith("data:")) {
         const [header, data] = input.split(",");
